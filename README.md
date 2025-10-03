@@ -11,6 +11,7 @@ You get a table with the top hits for that artist.
 
 Columns are renamed with "_" for example, "album_name". 
 Rows are dropped, leaving just the necessary data remaining.
+Column names are stripped of extra string space. 
 Column "preview_url" is empty on all data, so that was replaced with "Unknown".
 
 
