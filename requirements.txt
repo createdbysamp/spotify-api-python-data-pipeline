@@ -1,0 +1,7 @@
+pip install pandas
+pip install requests
+pip install python-dotenv
+
+
+import pandas as pd
+import sqlite3
