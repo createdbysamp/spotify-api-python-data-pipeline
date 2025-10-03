@@ -21,8 +21,8 @@ load_dotenv()
 # constants ------------------------------------------------------------------|
 API_ENDPOINT = "https://api.spotify.com/v1/artists/0FneT6GwedlczRJrLsDD9r"
 # DB_FILE = "southstate_top_songs.db"
-DB_FILE = "data/miko_top_songs.db"
-TABLE_NAME = "miko_top_songs"
+DB_FILE = "data/nickleback_top_songs.db"
+TABLE_NAME = "nickleback_top_songs"
 CREATE_TABLE_SQL = f"CREATE TABLE IF NOT EXISTS {TABLE_NAME} (id TEXT PRIMARY KEY, name TEXT NOT NULL, album_name TEXT, popularity INTEGER, duration_ms INTEGER, explicit BOOLEAN, preview_url TEXT);"
 
 client_id = os.getenv("CLIENT_ID")
@@ -97,11 +97,13 @@ def transform(product_list: List[dict]) -> DataFrame:
             "preview_url",
         ]
     ]
-    
+
     string_cols = ["id", "name", "album_name", "preview_url"]
     df[string_cols] = df[string_cols].apply(lambda x: x.str.strip())
 
     df["preview_url"] = df["preview_url"].fillna("Unknown")
+
+    # df["explicit"] = df["explicit"].replace({True: "explicit", False: "clean"})
 
     not_explicit = df.loc[df["explicit"] == False, ["name", "album_name", "explicit"]]
 
@@ -126,7 +128,7 @@ def load(dataframe):
 # main ------------------------------------------------------------------|
 def main():
     token = get_token()
-    result = search_for_artist(token, "young\\miko")
+    result = search_for_artist(token, "nickelback")
     print(result["name"])
     artist_id = result["id"]
     songs = get_songs_by_artist(token, artist_id)
