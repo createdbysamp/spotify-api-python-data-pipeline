@@ -3,6 +3,7 @@ from pandas import DataFrame
 from dotenv import load_dotenv
 from requests import post, get
 
+import argparse
 import requests
 import pandas as pd
 import sqlite3
@@ -21,14 +22,44 @@ load_dotenv()
 # constants ------------------------------------------------------------------|
 API_ENDPOINT = "https://api.spotify.com/v1/artists/0FneT6GwedlczRJrLsDD9r"
 # DB_FILE = "southstate_top_songs.db"
-DB_FILE = "data/nickleback_top_songs.db"
-TABLE_NAME = "nickleback_top_songs"
-CREATE_TABLE_SQL = f"CREATE TABLE IF NOT EXISTS {TABLE_NAME} (id TEXT PRIMARY KEY, name TEXT NOT NULL, album_name TEXT, popularity INTEGER, duration_ms INTEGER, explicit BOOLEAN, preview_url TEXT);"
+# DB_FILE = "data/nickleback_top_songs.db"
+# TABLE_NAME = "nickleback_top_songs"
+# CREATE_TABLE_SQL = f"CREATE TABLE IF NOT EXISTS {TABLE_NAME} (id TEXT PRIMARY KEY, name TEXT NOT NULL, album_name TEXT, popularity INTEGER, duration_ms INTEGER, explicit BOOLEAN, preview_url TEXT);"
 
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 
 # print(client_id, client_secret)
+
+
+# ARGE PARSE. ------------------------------------------------------------------|
+def get_args():
+    # creation of parser object
+    parser = argparse.ArgumentParser(
+        description="Run the ETL pipeline with custom input."
+    )
+    # the parser is now ready to accept arguments
+    parser.add_argument(
+        "--artist",
+        type=str,
+        required=True,
+        help="The name of the artist to search for.",
+    )
+    parser.add_argument(
+        "--db",
+        type=str,
+        default="data.db",
+        required=True,
+        help="the name of the db to save to!",
+    )
+    parser.add_argument(
+        "--table",
+        type=str,
+        default="etl_output",
+        help="the name of the SQLite table to load the data into.",
+    )
+
+    return parser
 
 
 # SPOTIFY API ------------------------------------------------------------------|
@@ -112,32 +143,37 @@ def transform(product_list: List[dict]) -> DataFrame:
     return df
 
 
-def load(dataframe):
+def load(dataframe: pd.DataFrame, db_path: str, table_name: str):
     """Loads the final DataFrame into a SQLite database table."""
     # Use sqlite3.connect() and df.to_sql() here
-    with sqlite3.connect(DB_FILE) as conn:
+    CREATE_TABLE_SQL = f"CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, name TEXT NOT NULL, album_name TEXT, popularity INTEGER, duration_ms INTEGER, explicit BOOLEAN, preview_url TEXT);"
+
+    with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(CREATE_TABLE_SQL)
         print("table created!!")
 
-    with sqlite3.connect(DB_FILE) as conn:
-        dataframe.to_sql(name=TABLE_NAME, con=conn, if_exists="append", index=False)
+    with sqlite3.connect(db_path) as conn:
+        dataframe.to_sql(name=table_name, con=conn, if_exists="append", index=False)
         print("data loaded!!")
 
 
 # main ------------------------------------------------------------------|
-def main():
+def main(artist, table_name, db_path):
     token = get_token()
-    result = search_for_artist(token, "nickelback")
+    result = search_for_artist(token, artist)
     print(result["name"])
     artist_id = result["id"]
     songs = get_songs_by_artist(token, artist_id)
 
     song_df = transform(songs)
-    loaded_df = load(song_df)
+    loaded_df = load(song_df, db_path, table_name)
     return
 
 
 if __name__ == "__main__":
     # Call your functions in sequence: E -> T -> L
-    main()
+    parser = get_args()
+    args = parser.parse_args()
+
+    main(args.artist, args.table, args.db)
