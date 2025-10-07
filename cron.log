@@ -1,0 +1,57 @@
+southstate
+                    name  ... explicit
+0                 Attics  ...    False
+1             Myb Nxt Yr  ...    False
+2                  Molly  ...    False
+3            What U Want  ...    False
+4              Polaroids  ...    False
+5                  Idwda  ...    False
+6  Alicia, Who Sees Mice  ...    False
+8   The Way You Leave Me  ...    False
+
+[8 rows x 3 columns]
+table created!!
+data loaded!!
+The Chainsmokers
+                       name              album_name  explicit
+0  Something Just Like This  Memories...Do Not Open     False
+1                    Closer                  Closer     False
+2         Don't Let Me Down       Don't Let Me Down     False
+3                     Roses                   Roses     False
+4                     Paris  Memories...Do Not Open     False
+6                    Spaces                  Spaces     False
+7                    Jungle                  Jungle     False
+8                    Smooth                  Smooth     False
+9              This Feeling                Sick Boy     False
+table created!!
+data loaded!!
+KISS
+                        name        album_name  explicit
+0  I Was Made For Lovin' You           Dynasty     False
+1     Rock And Roll All Nite   Dressed To Kill     False
+2          Detroit Rock City   Double Platinum     False
+3           Heaven's On Fire         Animalize     False
+4                 Lick It Up        Lick It Up     False
+5                   Love Gun          Love Gun     False
+6                    Forever  Hot In The Shade     False
+7                   Strutter              Kiss     False
+8         Crazy Crazy Nights      Crazy Nights     False
+9                       Beth         Destroyer     False
+table created!!
+data loaded!!
+Queen
+                                               name  ... explicit
+0               Bohemian Rhapsody - Remastered 2011  ...    False
+1               Don't Stop Me Now - Remastered 2011  ...    False
+2                  Under Pressure - Remastered 2011  ...    False
+3      Another One Bites The Dust - Remastered 2011  ...    False
+4                We Will Rock You - Remastered 2011  ...    False
+5  Crazy Little Thing Called Love - Remastered 2011  ...    False
+6                Somebody To Love - Remastered 2011  ...    False
+7                    Killer Queen - Remastered 2011  ...    False
+8                     Radio Ga Ga - Remastered 2011  ...    False
+9            We Are The Champions - Remastered 2011  ...    False
+
+[10 rows x 3 columns]
+table created!!
+data loaded!!

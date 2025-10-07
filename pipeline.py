@@ -3,6 +3,7 @@ from pandas import DataFrame
 from dotenv import load_dotenv
 from requests import post, get
 
+import logging
 import argparse
 import requests
 import pandas as pd
@@ -18,6 +19,12 @@ from pprint import pprint
 
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename='pipeline_log.log' # where to log to
+)
 
 # constants ------------------------------------------------------------------|
 API_ENDPOINT = "https://api.spotify.com/v1/artists/0FneT6GwedlczRJrLsDD9r"
@@ -64,6 +71,7 @@ def get_args():
 
 # SPOTIFY API ------------------------------------------------------------------|
 def get_token():
+    logging.info(f"Attempting to get Spotify token.")
     auth_string = client_id + ":" + client_secret
     auth_bytes = auth_string.encode("utf-8")
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
@@ -81,6 +89,8 @@ def get_token():
     # convert to python dictionary to be able to access it
     json_result = json.loads(result.content)
     token = json_result["access_token"]
+    
+    logging.info(f"token retrevial successful! you've got sonic coins now!!")
     return token
 
 
@@ -89,6 +99,7 @@ def get_auth_header(token):
 
 
 def search_for_artist(token, artist_name):
+    logging.info(f"searching for artist! {artist_name}")
     url = "https://api.spotify.com/v1/search"
     headers = get_auth_header(token)
     query = f"?q={artist_name}&type=artist&limit=1"
@@ -99,17 +110,26 @@ def search_for_artist(token, artist_name):
     if len(json_result) == 0:
         print("No artist exists with this name")
         return None
+    
+    logging.info(f"artist found!! nice!")
 
     return json_result[0]
 
 
 # functions ------------------------------------------------------------------|
 def get_songs_by_artist(token, artist_id):
+    # logging.info(f"pulling up songs by artist.")
+
     url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks?country=US"
-    headers = get_auth_header(token)
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)["tracks"]
-    return json_result
+    try: 
+        headers = get_auth_header(token)
+        result = get(url, headers=headers)
+        json_result = json.loads(result.content)["tracks"]
+        logging.info(f"songs by artist found!")
+        return json_result
+    except requests.exceptions.RequestException as e: 
+        logging.critical(f"FATAL EXTRACTION ERROR: Network or API failure for token. Details {e}")
+        return None
 
 
 def transform(product_list: List[dict]) -> DataFrame:
@@ -153,9 +173,11 @@ def load(dataframe: pd.DataFrame, db_path: str, table_name: str):
         cursor.execute(CREATE_TABLE_SQL)
         print("table created!!")
 
+    logging.warning("Pipeline started with default settings.")
     with sqlite3.connect(db_path) as conn:
         dataframe.to_sql(name=table_name, con=conn, if_exists="append", index=False)
         print("data loaded!!")
+    logging.info("Pipeline completed successfully!!")
 
 
 # main ------------------------------------------------------------------|
